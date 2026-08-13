@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Find Money",
+    "slug": "find-money",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#071612"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.findmoney.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#071612",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.findmoney.app",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}

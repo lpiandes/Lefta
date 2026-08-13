@@ -1,0 +1,30 @@
+{
+  "name": "find-money",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "npm run build -w @find-money/shared",
+    "dev:api": "npm run dev -w @find-money/api",
+    "dev:mobile": "npm run start -w @find-money/mobile",
+    "build:shared": "npm run build -w @find-money/shared",
+    "build:api": "npm run build -w @find-money/api",
+    "test": "npm run test -w @find-money/api"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lpiandes/Lefta.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lpiandes/Lefta/issues"
+  },
+  "homepage": "https://github.com/lpiandes/Lefta#readme",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}

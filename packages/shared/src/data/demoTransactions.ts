@@ -1,0 +1,248 @@
+import type { Account, FinancialConnection, Transaction, User } from '../types';
+import { daysAgo, daysFromNow } from '../lib/dates';
+
+/**
+ * Seed data that exercises every MVP detector:
+ * duplicate, recurring/inactivity, price anomaly, refund window, expiring credit.
+ */
+export const DEMO_USER: User = {
+  id: 'user_demo',
+  email: 'alex@example.com',
+  name: 'Alex Rivera',
+  createdAt: daysAgo(30),
+};
+
+export const DEMO_CONNECTION: FinancialConnection = {
+  id: 'conn_plaid_1',
+  provider: 'plaid',
+  institutionName: 'Chase',
+  status: 'active',
+  providerItemId: 'plaid_item_demo_token_ref',
+  connectedAt: daysAgo(0),
+};
+
+export const DEMO_ACCOUNTS: Account[] = [
+  {
+    id: 'acct_checking',
+    connectionId: DEMO_CONNECTION.id,
+    institutionName: 'Chase',
+    name: 'Total Checking',
+    type: 'depository',
+    mask: '4821',
+    currentBalance: 2840.55,
+  },
+  {
+    id: 'acct_credit',
+    connectionId: DEMO_CONNECTION.id,
+    institutionName: 'Chase',
+    name: 'Freedom Unlimited',
+    type: 'credit',
+    mask: '1093',
+    currentBalance: -612.4,
+  },
+];
+
+export function buildDemoTransactions(): Transaction[] {
+  const checking = 'acct_checking';
+  const credit = 'acct_credit';
+
+  return [
+    {
+      id: 'txn_dup_a',
+      accountId: credit,
+      merchantName: 'Adobe Creative Cloud',
+      amount: 84.99,
+      date: daysAgo(12),
+      category: 'Software',
+      pending: false,
+    },
+    {
+      id: 'txn_dup_b',
+      accountId: credit,
+      merchantName: 'Adobe Creative Cloud',
+      amount: 84.99,
+      date: daysAgo(11),
+      category: 'Software',
+      pending: false,
+    },
+    {
+      id: 'txn_sub_1',
+      accountId: credit,
+      merchantName: 'Spotify Premium',
+      amount: 15.99,
+      date: daysAgo(5),
+      category: 'Entertainment',
+      pending: false,
+    },
+    {
+      id: 'txn_sub_2',
+      accountId: credit,
+      merchantName: 'Spotify Premium',
+      amount: 15.99,
+      date: daysAgo(35),
+      category: 'Entertainment',
+      pending: false,
+    },
+    {
+      id: 'txn_sub_3',
+      accountId: credit,
+      merchantName: 'Spotify Premium',
+      amount: 15.99,
+      date: daysAgo(65),
+      category: 'Entertainment',
+      pending: false,
+    },
+    {
+      id: 'txn_sub_4',
+      accountId: credit,
+      merchantName: 'Spotify Premium',
+      amount: 15.99,
+      date: daysAgo(95),
+      category: 'Entertainment',
+      pending: false,
+    },
+    {
+      id: 'txn_gym_1',
+      accountId: checking,
+      merchantName: 'FitLife Gym',
+      amount: 72.0,
+      date: daysAgo(8),
+      category: 'Fitness',
+      pending: false,
+      metadata: { lastCheckIn: daysAgo(120) },
+    },
+    {
+      id: 'txn_gym_2',
+      accountId: checking,
+      merchantName: 'FitLife Gym',
+      amount: 72.0,
+      date: daysAgo(38),
+      category: 'Fitness',
+      pending: false,
+    },
+    {
+      id: 'txn_gym_3',
+      accountId: checking,
+      merchantName: 'FitLife Gym',
+      amount: 72.0,
+      date: daysAgo(68),
+      category: 'Fitness',
+      pending: false,
+    },
+    {
+      id: 'txn_isp_low_1',
+      accountId: checking,
+      merchantName: 'Spectrum Internet',
+      amount: 79.99,
+      date: daysAgo(100),
+      category: 'Utilities',
+      pending: false,
+    },
+    {
+      id: 'txn_isp_low_2',
+      accountId: checking,
+      merchantName: 'Spectrum Internet',
+      amount: 79.99,
+      date: daysAgo(70),
+      category: 'Utilities',
+      pending: false,
+    },
+    {
+      id: 'txn_isp_low_3',
+      accountId: checking,
+      merchantName: 'Spectrum Internet',
+      amount: 79.99,
+      date: daysAgo(40),
+      category: 'Utilities',
+      pending: false,
+    },
+    {
+      id: 'txn_isp_high',
+      accountId: checking,
+      merchantName: 'Spectrum Internet',
+      amount: 129.99,
+      date: daysAgo(10),
+      category: 'Utilities',
+      pending: false,
+    },
+    {
+      id: 'txn_return',
+      accountId: credit,
+      merchantName: 'Best Buy',
+      amount: 199.0,
+      date: daysAgo(4),
+      category: 'Shopping',
+      pending: false,
+      orderNumber: 'BBY-883421',
+      metadata: {
+        returnWindowDays: '15',
+        product: 'Wireless headphones',
+      },
+    },
+    {
+      id: 'txn_price_adj',
+      accountId: credit,
+      merchantName: 'Nike',
+      amount: 180.0,
+      date: daysAgo(12),
+      category: 'Shopping',
+      pending: false,
+      orderNumber: 'NK-552910',
+      metadata: {
+        currentPrice: '129',
+        product: 'Running shoes',
+        priceMatchWindowDays: '30',
+      },
+    },
+    {
+      id: 'txn_credit_travel',
+      accountId: credit,
+      merchantName: 'Chase Travel Credit',
+      amount: 0,
+      date: daysAgo(1),
+      category: 'Rewards',
+      pending: false,
+      metadata: {
+        creditBalance: '150',
+        expiresAt: daysFromNow(8),
+        creditType: 'travel',
+      },
+    },
+    {
+      id: 'txn_food_1',
+      accountId: credit,
+      merchantName: 'Sweetgreen',
+      amount: 16.4,
+      date: daysAgo(2),
+      category: 'Food',
+      pending: false,
+    },
+    {
+      id: 'txn_food_2',
+      accountId: credit,
+      merchantName: 'Uber Eats',
+      amount: 28.15,
+      date: daysAgo(3),
+      category: 'Food',
+      pending: false,
+    },
+    {
+      id: 'txn_gas',
+      accountId: checking,
+      merchantName: 'Shell',
+      amount: 42.2,
+      date: daysAgo(6),
+      category: 'Transport',
+      pending: false,
+    },
+    {
+      id: 'txn_rent',
+      accountId: checking,
+      merchantName: 'Apartments.com Rent',
+      amount: 1850,
+      date: daysAgo(7),
+      category: 'Housing',
+      pending: false,
+    },
+  ];
+}
