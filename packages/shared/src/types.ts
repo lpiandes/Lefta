@@ -102,6 +102,8 @@ export interface ActionStep {
   description?: string;
 }
 
+export type FeeStatus = 'none' | 'owed' | 'pending' | 'paid' | 'waived';
+
 export interface RecoveryAction {
   id: string;
   opportunityId: string;
@@ -109,11 +111,18 @@ export interface RecoveryAction {
   status: OpportunityStatus;
   steps: ActionStep[];
   sharedInfo: string[];
+  /** Self-serve instructions — never auto-dispute */
+  guidance?: string[];
   submittedAt?: string;
   recoveredAt?: string;
   recoveredAmount?: number;
   feeAmount?: number;
+  feeStatus?: FeeStatus;
+  stripePaymentIntentId?: string;
+  stripeCheckoutUrl?: string;
   notes?: string;
+  /** Copy-paste merchant/issuer request. Never auto-sent. */
+  disputeDraft?: string;
 }
 
 export interface MoneySummary {

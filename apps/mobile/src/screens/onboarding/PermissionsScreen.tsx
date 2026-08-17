@@ -8,11 +8,11 @@ import type { RootStackParamList } from '../../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Permissions'>;
 
-export function PermissionsScreen({ navigation, route }: Props) {
+export function PermissionsScreen({ navigation }: Props) {
   return (
-    <Screen>
+    <Screen showBack>
       <Text style={styles.title}>What Find Money can access</Text>
-      <Text style={styles.support}>Connecting {route.params.institution}</Text>
+      <Text style={styles.support}>Read-only access through your bank’s connection provider.</Text>
 
       <View style={styles.block}>
         <CheckRow label="Account information" />
@@ -29,13 +29,10 @@ export function PermissionsScreen({ navigation, route }: Props) {
       </View>
 
       <Text style={styles.note}>
-        MVP is a read-only financial intelligence product — a major safety and trust advantage.
+        Find Money is a read-only financial intelligence product — it never moves your money.
       </Text>
 
-      <Button
-        label="Continue"
-        onPress={() => navigation.navigate('Security', { institution: route.params.institution })}
-      />
+      <Button label="Continue" onPress={() => navigation.navigate('Security')} />
     </Screen>
   );
 }

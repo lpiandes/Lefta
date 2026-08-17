@@ -2,11 +2,14 @@ export type RootStackParamList = {
   Splash: undefined;
   Onboarding: undefined;
   Promise: undefined;
+  Auth: undefined;
   ConnectAccounts: undefined;
   BankConnect: undefined;
+  PlaidLink: { linkToken: string };
   EmailConnect: undefined;
-  Permissions: { institution: string };
-  Security: { institution: string };
+  UploadBills: undefined;
+  Permissions: undefined;
+  Security: undefined;
   Scanning: undefined;
   Main: undefined;
   OpportunityDetail: { id: string };
@@ -15,6 +18,7 @@ export type RootStackParamList = {
   Tracking: { id: string };
   Success: { id: string };
   Privacy: undefined;
+  Terms: undefined;
 };
 
 export type MainTabParamList = {

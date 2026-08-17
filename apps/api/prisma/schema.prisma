@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Minimal user profile — no financial payloads here.
+model User {
+  id           String   @id
+  email        String   @unique
+  name         String
+  passwordHash String
+  hasScanned   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  connections      FinancialConnection[]
+  accounts         Account[]
+  transactions     Transaction[]
+  opportunities    Opportunity[]
+  actions          RecoveryAction[]
+  auditLogs        AuditLog[]
+  refreshSessions  RefreshSession[]
+}
+
+/// Provider item refs only — never bank usernames/passwords.
+model FinancialConnection {
+  id                   String   @id
+  userId               String
+  provider             String
+  institutionName      String
+  status               String
+  providerItemId       String
+  accessTokenEncrypted String?
+  connectedAt          DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accounts Account[]
+
+  @@index([userId])
+}
+
+model Account {
+  id              String  @id
+  userId          String
+  connectionId    String
+  institutionName String
+  name            String
+  type            String
+  mask            String
+  currentBalance  Float?
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  connection   FinancialConnection  @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+/// Detector-needed fields only (merchant, amount, date, category, ids).
+model Transaction {
+  id          String  @id
+  userId      String
+  accountId   String
+  merchantName String
+  amount      Float
+  date        String
+  category    String
+  pending     Boolean @default(false)
+  orderNumber String?
+  metadata    Json?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([accountId])
+}
+
+model Opportunity {
+  id                    String   @id
+  userId                String
+  category              String
+  detectorId            String
+  title                 String
+  summary               String
+  whyFlagged            String
+  potentialValue        Float
+  confidence            String
+  effort                String
+  status                String
+  actionMode            String
+  merchantName          String
+  evidence              Json
+  relatedTransactionIds Json
+  createdAt             DateTime
+  updatedAt             DateTime
+  expiresAt             String?
+
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action RecoveryAction?
+
+  @@index([userId])
+}
+
+model RecoveryAction {
+  id                    String   @id
+  userId                String
+  opportunityId         String   @unique
+  mode                  String
+  status                String
+  steps                 Json
+  sharedInfo            Json
+  guidance              Json?
+  submittedAt           DateTime?
+  recoveredAt           DateTime?
+  recoveredAmount       Float?
+  feeAmount             Float?
+  feeStatus             String   @default("none")
+  stripePaymentIntentId String?
+  stripeCheckoutUrl     String?
+  notes                 String?
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity  Opportunity  @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id
+  userId    String
+  event     String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Hashed opaque refresh tokens. Raw tokens never persist.
+model RefreshSession {
+  id        String    @id
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

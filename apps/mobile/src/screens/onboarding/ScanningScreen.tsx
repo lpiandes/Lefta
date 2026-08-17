@@ -18,9 +18,14 @@ export function ScanningScreen({ navigation }: Props) {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      await runScan();
-      if (!mounted) return;
-      setDone(true);
+      try {
+        await runScan();
+        if (!mounted) return;
+        setDone(true);
+      } catch {
+        if (!mounted) return;
+        setDone(true);
+      }
     })();
     return () => {
       mounted = false;

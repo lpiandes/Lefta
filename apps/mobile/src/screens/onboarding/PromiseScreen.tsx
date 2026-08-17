@@ -3,6 +3,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '../../components/Button';
 import { CheckRow } from '../../components/CheckRow';
 import { Screen } from '../../components/Screen';
+import { useAppState } from '../../state/AppState';
 import { colors, space, type } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 
@@ -20,6 +21,7 @@ const ITEMS = [
 ];
 
 export function PromiseScreen({ navigation }: Props) {
+  const { user } = useAppState();
   return (
     <Screen>
       <Text style={styles.title}>We’ll do the searching.</Text>
@@ -33,7 +35,10 @@ export function PromiseScreen({ navigation }: Props) {
         You stay in control. Nothing happens without your approval.
       </Text>
 
-      <Button label="Continue" onPress={() => navigation.navigate('ConnectAccounts')} />
+      <Button
+        label="Continue"
+        onPress={() => navigation.navigate(user ? 'ConnectAccounts' : 'Auth')}
+      />
     </Screen>
   );
 }

@@ -13,35 +13,33 @@ Not a budgeting app. Not Rocket Money with AI. The product is **money recovery**
 ## Quick start
 
 ```bash
-# install
 npm install
+cp .env.example .env
+cp apps/mobile/.env.example apps/mobile/.env
+# Fill required values in both files (see below).
 
-# build shared domain + engine
+docker compose up -d
+npm run db:push
 npm run build:shared
-
-# API (http://localhost:4000)
 npm run dev:api
-
-# Mobile (Expo)
 npm run dev:mobile
 ```
 
-## What’s in the MVP
+Create an account in the app, connect a bank with Plaid Link, then scan. There is no demo bank path — Plaid credentials are required to connect accounts.
 
+## What’s in the product
+
+- Account create / login (short-lived access JWT + rotating refresh sessions)
 - Onboarding + trust/security screens
-- Simulated Plaid bank connect (read-only)
-- Opportunity Detection Engine:
-  - duplicate charges
-  - unused subscriptions
-  - unusual bill increases
-  - refund/return windows
-  - price adjustments
-  - expiring credits
+- Plaid Link bank connect (encrypted provider tokens only)
+- Opportunity Detection Engine on the user’s transactions
 - Home “We found $X” dashboard
 - Found feed with category filters
-- Opportunity detail → Do it for me → approval → tracking → success
-- Recovery history + privacy settings
-- Success-based fee model (20% of verified recovered cash)
+- Opportunity detail → Do it for me → approval → tracking
+- Recovery is verified only when cash is confirmed
+- 20% success fee on verified recovered cash (Stripe Checkout when Stripe is configured)
+- Disconnect + delete stored financial data
+- Face ID / device passcode unlock when the device supports it
 
 ## Repo map
 
@@ -49,17 +47,9 @@ npm run dev:mobile
 |------|------|
 | `apps/mobile` | Expo React Native app |
 | `apps/api` | Node/Express API |
-| `packages/shared` | Types, demo data, detectors, formatters |
+| `packages/shared` | Types, test fixtures, detectors, formatters |
 | `docs/ARCHITECTURE.md` | System design |
-
-## Demo path
-
-1. Open the app → **Find My Money**
-2. Connect a bank (any listed institution)
-3. Review permissions + security
-4. Watch the scan
-5. Tap an opportunity → **Do it for me**
-6. Approve → simulate recovery → share loop
+| `docs/PRODUCTION.md` | How to go live: host, Plaid, Stripe |
 
 ## Tests
 
@@ -70,6 +60,7 @@ npm test
 ## Stack
 
 - Mobile: Expo + React Navigation + Fraunces / DM Sans
-- API: Express + TypeScript
+- API: Express + TypeScript + Postgres
 - Shared engine: deterministic detectors + explanation layer
-- Production targets: Plaid, Postgres, Clerk/Supabase Auth, Stripe, APNs/FCM
+- Auth: email/password, bcrypt, access JWT + hashed refresh sessions
+- Production targets: Plaid, Postgres, Stripe

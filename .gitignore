@@ -6,6 +6,7 @@ web-build/
 .env
 .env.*
 !.env.example
+!apps/mobile/.env.example
 .DS_Store
 coverage/
 *.tsbuildinfo

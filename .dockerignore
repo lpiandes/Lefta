@@ -1,0 +1,7 @@
+node_modules
+.git
+.expo
+apps/mobile/.expo
+dist
+*.log
+.env

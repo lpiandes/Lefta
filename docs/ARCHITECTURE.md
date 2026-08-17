@@ -22,7 +22,9 @@ apps/
         main/             Home, Found feed, Expiring, History
         opportunity/      Detail → plan → approve → track → success
         settings/         Accounts, privacy, delete data
-      state/              AppState — local demo store + engine calls
+      state/              AppState — API client + session
+      theme/              Colors, type, spacing
+      utils/              Formatting helpers
       theme/              Colors, type, spacing
       utils/              Formatting helpers
   api/                    Express + TypeScript API
@@ -74,13 +76,19 @@ The model must never invent disputes or move money autonomously.
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| POST | `/api/accounts/connect/bank` | Simulated Plaid Link connect |
-| POST | `/api/scan` | Run detection engine |
+| POST | `/api/auth/register` | Create account (access JWT + rotating refresh token) |
+| POST | `/api/auth/login` | Sign in |
+| POST | `/api/auth/refresh` | Rotate refresh session |
+| POST | `/api/auth/logout` | Revoke refresh sessions |
+| GET | `/api/auth/me` | Current user + summary |
+| POST | `/api/accounts/plaid/link-token` | Plaid Link token |
+| POST | `/api/accounts/plaid/exchange` | Exchange public_token; store encrypted access token |
+| POST | `/api/scan` | Sync (Plaid) + run detection engine |
 | GET | `/api/opportunities` | Money Found feed |
 | GET | `/api/opportunities/:id` | Detail + evidence |
 | POST | `/api/actions/:id/plan` | Build action plan |
-| POST | `/api/actions/:id/approve` | User approval gate |
-| POST | `/api/actions/:id/complete` | Demo recovery confirmation |
+| POST | `/api/actions/:id/approve` | User approval gate (does not mark recovered) |
+| POST | `/api/actions/:id/verify` | Confirm recovered cash; 20% Stripe fee |
 | GET | `/api/user/privacy` | Privacy commitments |
 | DELETE | `/api/accounts/data` | Delete user financial data |
 

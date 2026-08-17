@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from 'react-native';
+import { Alert, StyleSheet, Text } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '../../components/Button';
 import { CheckRow } from '../../components/CheckRow';
@@ -10,11 +10,11 @@ type Props = NativeStackScreenProps<RootStackParamList, 'EmailConnect'>;
 
 export function EmailConnectScreen({ navigation }: Props) {
   return (
-    <Screen>
+    <Screen showBack>
       <Text style={styles.title}>Connect email for purchase protection</Text>
       <Text style={styles.support}>
-        Your bank says you spent $199 at Best Buy. Your email can reveal the receipt, order number,
-        return policy, and warranty — which dramatically increases what we can find.
+        A charge on your bank feed is only part of the story. Email can reveal the receipt, order
+        number, return policy, and warranty — which can increase what we can recover.
       </Text>
 
       <Text style={styles.subtitle}>Narrow permissions</Text>
@@ -23,13 +23,19 @@ export function EmailConnectScreen({ navigation }: Props) {
 
       <Button
         label="Continue with Google / Microsoft"
-        onPress={() => navigation.navigate('BankConnect')}
+        onPress={() => {
+          Alert.alert(
+            'Email connect is not live yet',
+            'Google and Microsoft OAuth need app review. Connect a bank first — that’s how Find Money finds money today.',
+            [{ text: 'OK', onPress: () => navigation.goBack() }],
+          );
+        }}
         style={{ marginTop: space.xl }}
       />
       <Button
         label="Skip for now"
         variant="ghost"
-        onPress={() => navigation.navigate('BankConnect')}
+        onPress={() => navigation.goBack()}
         style={{ marginTop: space.sm }}
       />
     </Screen>

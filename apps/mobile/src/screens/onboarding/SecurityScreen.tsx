@@ -1,30 +1,45 @@
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
-import { useAppState } from '../../state/AppState';
+import { api } from '../../api/client';
 import { colors, fonts, radii, space, type } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Security'>;
 
 const POINTS = [
-  { icon: '🔒', text: 'Bank-level encryption in transit (TLS)' },
-  { icon: '🔐', text: 'Encrypted data at rest' },
-  { icon: '🛡️', text: 'Read-only access' },
-  { icon: '🚫', text: 'No ability to move your money' },
-  { icon: '🗑️', text: 'Delete your data anytime' },
+  { icon: '🔒', text: 'TLS in transit; AES-256-GCM for provider tokens at rest' },
+  { icon: '🔐', text: 'Encrypted data at rest in Postgres' },
+  { icon: '🛡️', text: 'Read-only access — no money movement' },
+  { icon: '🚫', text: 'Bank passwords are never stored' },
+  { icon: '🗑️', text: 'Disconnect or delete your data anytime' },
 ];
 
-export function SecurityScreen({ navigation, route }: Props) {
-  const { connectBank, completeOnboarding } = useAppState();
+export function SecurityScreen({ navigation }: Props) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function connect() {
+    setBusy(true);
+    setError(null);
+    try {
+      const { linkToken } = await api.createLinkToken();
+      navigation.replace('PlaidLink', { linkToken });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not start bank connect');
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
-    <Screen>
+    <Screen showBack>
       <Text style={styles.title}>Your bank password isn’t stored by Find Money.</Text>
       <Text style={styles.support}>
-        With OAuth connections, {route.params.institution} authenticates you and provides authorized
-        access. The provider does not share your bank credentials with this app.
+        Your bank authenticates you through Plaid. The provider does not share your bank credentials
+        with this app. We store an encrypted access token only.
       </Text>
 
       <View style={styles.list}>
@@ -36,14 +51,9 @@ export function SecurityScreen({ navigation, route }: Props) {
         ))}
       </View>
 
-      <Button
-        label="Connect & Scan"
-        onPress={() => {
-          connectBank();
-          completeOnboarding();
-          navigation.replace('Scanning');
-        }}
-      />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      <Button label={busy ? 'Connecting…' : 'Open Plaid Link'} onPress={() => void connect()} disabled={busy} />
     </Screen>
   );
 }
@@ -82,5 +92,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyMedium,
     fontSize: 15,
     color: colors.text,
+  },
+  error: {
+    fontFamily: fonts.body,
+    color: colors.danger,
+    marginBottom: space.md,
   },
 });

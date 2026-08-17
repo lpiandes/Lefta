@@ -9,7 +9,6 @@ export const SCAN_STEPS: ScanProgressStep[] = [
   { id: 'unusual', label: 'Checking unusual charges…', done: false },
   { id: 'refunds', label: 'Checking potential refunds…', done: false },
   { id: 'credits', label: 'Checking credits…', done: false },
-  { id: 'rewards', label: 'Checking rewards…', done: false },
 ];
 
 /**

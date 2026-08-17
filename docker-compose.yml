@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: findmoney
+      POSTGRES_PASSWORD: findmoney
+      POSTGRES_DB: findmoney
+    ports:
+      - '5432:5432'
+    volumes:
+      - findmoney_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U findmoney']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  findmoney_pg:

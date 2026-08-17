@@ -15,7 +15,7 @@ type Props = CompositeScreenProps<
 >;
 
 export function SettingsScreen({ navigation }: Props) {
-  const { accounts, connections, userName, disconnectAll, deleteData } = useAppState();
+  const { accounts, connections, user, userName, disconnectAll, deleteData, logout } = useAppState();
 
   return (
     <Screen>
@@ -23,8 +23,8 @@ export function SettingsScreen({ navigation }: Props) {
 
       <Section title="Account">
         <Line label="Name" value={userName} />
-        <Line label="Email" value="alex@example.com" />
-        <Line label="Plan" value="Free · 20% success fee on recovered cash" />
+        <Line label="Email" value={user?.email ?? '—'} />
+        <Line label="Plan" value="Free · 20% success fee on verified recovered cash" />
       </Section>
 
       <Section title="Accounts">
@@ -49,30 +49,40 @@ export function SettingsScreen({ navigation }: Props) {
 
       <Section title="Privacy">
         <Button label="Your Money. Your Data." variant="ghost" onPress={() => navigation.navigate('Privacy')} />
+        <Button label="Terms of use" variant="ghost" onPress={() => navigation.navigate('Terms')} />
         <Button
           label="Disconnect accounts"
           variant="ghost"
           onPress={() => {
-            disconnectAll();
-            Alert.alert('Disconnected', 'Financial connections removed.');
+            void disconnectAll().then(() =>
+              Alert.alert('Disconnected', 'Financial connections removed. Provider tokens revoked when possible.'),
+            );
           }}
         />
         <Button
           label="Delete my data"
           variant="danger"
           onPress={() => {
-            deleteData();
-            Alert.alert('Deleted', 'Your demo financial data was cleared.');
-            navigation.getParent()?.navigate('Splash');
+            void deleteData().then(() => {
+              Alert.alert('Deleted', 'Your account and financial data were deleted.');
+              navigation.getParent()?.navigate('Splash');
+            });
           }}
           style={{ marginTop: space.sm }}
         />
       </Section>
 
       <Section title="Security">
-        <Line label="Face ID / Passcode" value="Ready for production wiring" />
-        <Line label="MFA" value="Recommended at launch" />
+        <Line label="Face ID / Passcode" value="Required to unlock the app when available" />
+        <Line label="Sessions" value="Short-lived access tokens with rotating refresh sessions" />
         <Line label="Access mode" value="Read-only" />
+        <Button
+          label="Sign out"
+          variant="ghost"
+          onPress={() => {
+            void logout().then(() => navigation.getParent()?.navigate('Splash'));
+          }}
+        />
       </Section>
 
       <Section title="Notifications">

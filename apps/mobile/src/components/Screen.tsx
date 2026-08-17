@@ -3,24 +3,31 @@ import { ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, space } from '../theme';
+import { BackHeader } from './BackHeader';
 
 type Props = {
   children: ReactNode;
   scroll?: boolean;
+  showBack?: boolean;
+  backLabel?: string;
   style?: ViewStyle;
   contentStyle?: ViewStyle;
 };
 
-export function Screen({ children, scroll = true, style, contentStyle }: Props) {
+export function Screen({ children, scroll = true, showBack = false, backLabel, style, contentStyle }: Props) {
   const body = scroll ? (
     <ScrollView
       contentContainerStyle={[styles.content, contentStyle]}
       showsVerticalScrollIndicator={false}
     >
+      {showBack ? <BackHeader label={backLabel} /> : null}
       {children}
     </ScrollView>
   ) : (
-    <View style={[styles.content, styles.flex, contentStyle]}>{children}</View>
+    <View style={[styles.content, styles.flex, contentStyle]}>
+      {showBack ? <BackHeader label={backLabel} /> : null}
+      {children}
+    </View>
   );
 
   return (

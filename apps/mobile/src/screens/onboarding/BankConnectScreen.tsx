@@ -1,49 +1,30 @@
-import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
-import { colors, fonts, radii, space, type } from '../../theme';
+import { useAppState } from '../../state/AppState';
+import { colors, space, type } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'BankConnect'>;
 
-const BANKS = ['Chase', 'Bank of America', 'Capital One', 'Wells Fargo', 'Citi', 'US Bank'];
-
 export function BankConnectScreen({ navigation }: Props) {
-  const [query, setQuery] = useState('');
-  const filtered = BANKS.filter((b) => b.toLowerCase().includes(query.trim().toLowerCase()));
+  const { plaidConfigured } = useAppState();
 
   return (
-    <Screen>
-      <Text style={styles.title}>Select your bank</Text>
+    <Screen showBack>
+      <Text style={styles.title}>Connect with Plaid</Text>
       <Text style={styles.support}>
-        Connected through a financial-data provider (Plaid Link). You authenticate with your
-        institution — Find Money never sees your bank password.
+        {plaidConfigured
+          ? 'You’ll authenticate with your bank through Plaid Link. Find Money never sees your bank password — we store an encrypted provider token only.'
+          : 'Bank connect is not available until PLAID_CLIENT_ID, PLAID_SECRET, and PLAID_ENV are set on the API. There is no demo bank path.'}
       </Text>
 
-      <TextInput
-        value={query}
-        onChangeText={setQuery}
-        placeholder="Search banks"
-        placeholderTextColor={colors.textMuted}
-        style={styles.input}
+      <Button
+        label="Continue"
+        disabled={!plaidConfigured}
+        onPress={() => navigation.navigate('Permissions')}
       />
-
-      <View style={styles.list}>
-        {filtered.map((bank) => (
-          <Pressable
-            key={bank}
-            style={styles.row}
-            onPress={() => navigation.navigate('Permissions', { institution: bank })}
-          >
-            <Text style={styles.bank}>{bank}</Text>
-            <Text style={styles.chevron}>→</Text>
-          </Pressable>
-        ))}
-      </View>
-
-      <Button label="Back" variant="ghost" onPress={() => navigation.goBack()} />
     </Screen>
   );
 }
@@ -59,37 +40,5 @@ const styles = StyleSheet.create({
     ...type.body,
     color: colors.textMuted,
     marginBottom: space.lg,
-  },
-  input: {
-    backgroundColor: colors.inkElevated,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radii.md,
-    paddingHorizontal: space.md,
-    paddingVertical: 14,
-    color: colors.text,
-    fontFamily: fonts.body,
-    fontSize: 16,
-    marginBottom: space.md,
-  },
-  list: {
-    marginBottom: space.lg,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  bank: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 17,
-    color: colors.text,
-  },
-  chevron: {
-    color: colors.moneyBright,
-    fontSize: 18,
   },
 });

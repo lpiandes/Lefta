@@ -9,7 +9,9 @@
     "dev:mobile": "npm run start -w @find-money/mobile",
     "build:shared": "npm run build -w @find-money/shared",
     "build:api": "npm run build -w @find-money/api",
-    "test": "npm run test -w @find-money/api"
+    "test": "npm run test -w @find-money/api",
+    "db:up": "docker compose up -d",
+    "db:push": "npm run prisma:push -w @find-money/api"
   },
   "repository": {
     "type": "git",

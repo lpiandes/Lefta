@@ -17,14 +17,14 @@ export function ApprovalScreen({ navigation, route }: Props) {
 
   if (!opportunity) {
     return (
-      <Screen>
+      <Screen showBack>
         <Text style={styles.title}>Opportunity not found</Text>
       </Screen>
     );
   }
 
   return (
-    <Screen>
+    <Screen showBack>
       <Text style={styles.title}>Ready to take action</Text>
 
       <View style={styles.panel}>
@@ -46,8 +46,9 @@ export function ApprovalScreen({ navigation, route }: Props) {
       <Button
         label="Approve & Submit"
         onPress={() => {
-          approveAction(opportunity.id);
-          navigation.replace('Tracking', { id: opportunity.id });
+          void approveAction(opportunity.id).then(() =>
+            navigation.replace('Tracking', { id: opportunity.id }),
+          );
         }}
       />
       <Button label="Cancel" variant="ghost" onPress={() => navigation.goBack()} style={{ marginTop: space.sm }} />

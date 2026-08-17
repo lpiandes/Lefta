@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Share, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
@@ -11,13 +11,13 @@ import { formatCompactDate, formatMoney } from '../../utils/format';
 type Props = NativeStackScreenProps<RootStackParamList, 'Tracking'>;
 
 export function TrackingScreen({ navigation, route }: Props) {
-  const { getOpportunity, getAction, completeRecovery } = useAppState();
+  const { getOpportunity, getAction, verifyRecovery } = useAppState();
   const opportunity = getOpportunity(route.params.id);
   const action = getAction(route.params.id);
 
   if (!opportunity) {
     return (
-      <Screen>
+      <Screen showBack>
         <Text style={styles.title}>Opportunity not found</Text>
       </Screen>
     );
@@ -53,7 +53,7 @@ export function TrackingScreen({ navigation, route }: Props) {
   ];
 
   return (
-    <Screen>
+    <Screen showBack>
       <Text style={styles.eyebrow}>Recovery in progress</Text>
       <Text style={styles.title}>{opportunity.merchantName}</Text>
       <Text style={styles.amount}>{formatMoney(opportunity.potentialValue)}</Text>
@@ -64,16 +64,31 @@ export function TrackingScreen({ navigation, route }: Props) {
         Status: {action?.status === 'waiting' ? 'Waiting for merchant' : opportunity.status}
       </Text>
 
+      <Text style={styles.note}>
+        Recovery stays “waiting” until cash is verified. The 20% success fee applies only then — not
+        to hypothetical savings.
+      </Text>
+
       <View style={{ marginTop: space.lg }}>
         <Timeline steps={trackingSteps} />
       </View>
 
+      {action?.disputeDraft ? (
+        <Button
+          label="Open request draft"
+          variant="secondary"
+          onPress={() => void Share.share({ message: action.disputeDraft! })}
+          style={{ marginTop: space.md }}
+        />
+      ) : null}
+
       {action?.status !== 'recovered' ? (
         <Button
-          label="Simulate merchant recovery (demo)"
+          label="I received this money"
           onPress={() => {
-            completeRecovery(opportunity.id);
-            navigation.replace('Success', { id: opportunity.id });
+            void verifyRecovery(opportunity.id).then(() =>
+              navigation.replace('Success', { id: opportunity.id }),
+            );
           }}
           style={{ marginTop: space.xl }}
         />
@@ -124,5 +139,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
     marginTop: 6,
+  },
+  note: {
+    ...type.body,
+    color: colors.goldSoft,
+    marginTop: space.md,
   },
 });

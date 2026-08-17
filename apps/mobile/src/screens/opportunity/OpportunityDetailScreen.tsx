@@ -16,9 +16,8 @@ export function OpportunityDetailScreen({ navigation, route }: Props) {
 
   if (!opportunity) {
     return (
-      <Screen>
+      <Screen showBack>
         <Text style={styles.title}>Opportunity not found</Text>
-        <Button label="Back" onPress={() => navigation.goBack()} />
       </Screen>
     );
   }
@@ -26,7 +25,7 @@ export function OpportunityDetailScreen({ navigation, route }: Props) {
   const meta = OPPORTUNITY_CATEGORIES[opportunity.category];
 
   return (
-    <Screen>
+    <Screen showBack>
       <Text style={[styles.badge, { color: meta.color }]}>{meta.label}</Text>
       <Text style={styles.title}>{opportunity.title}</Text>
       <Text style={styles.amount}>Potential recovery: {formatMoney(opportunity.potentialValue)}</Text>
@@ -52,22 +51,26 @@ export function OpportunityDetailScreen({ navigation, route }: Props) {
       <Button
         label="Do it for me"
         onPress={() => {
-          planAction(opportunity.id);
-          navigation.navigate('ActionPlan', { id: opportunity.id });
+          void planAction(opportunity.id).then(() =>
+            navigation.navigate('ActionPlan', { id: opportunity.id }),
+          );
         }}
       />
       <Button
         label="I’ll handle it myself"
         variant="secondary"
-        onPress={() => navigation.navigate('ActionPlan', { id: opportunity.id, selfServe: true })}
+        onPress={() => {
+          void planAction(opportunity.id, true).then(() =>
+            navigation.navigate('ActionPlan', { id: opportunity.id, selfServe: true }),
+          );
+        }}
         style={{ marginTop: space.sm }}
       />
       <Button
         label="Ignore"
         variant="ghost"
         onPress={() => {
-          ignoreOpportunity(opportunity.id);
-          navigation.goBack();
+          void ignoreOpportunity(opportunity.id).then(() => navigation.goBack());
         }}
         style={{ marginTop: space.sm }}
       />

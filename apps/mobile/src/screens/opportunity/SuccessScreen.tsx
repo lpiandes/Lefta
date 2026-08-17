@@ -1,4 +1,4 @@
-import { Share, StyleSheet, Text, View } from 'react-native';
+import { Linking, Share, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
@@ -37,7 +37,20 @@ export function SuccessScreen({ navigation, route }: Props) {
 
       <View style={styles.stats}>
         <Text style={styles.stat}>You kept: {formatMoney(kept)}</Text>
-        <Text style={styles.stat}>Find Money fee: {formatMoney(fee)}</Text>
+        <Text style={styles.stat}>Find Money fee (20% of verified cash): {formatMoney(fee)}</Text>
+        {action.feeStatus === 'pending' && action.stripeCheckoutUrl ? (
+          <Button
+            label={`Pay ${formatMoney(fee)} success fee`}
+            onPress={() => void Linking.openURL(action.stripeCheckoutUrl!)}
+            style={{ marginBottom: space.md }}
+          />
+        ) : null}
+        {action.feeStatus === 'owed' ? (
+          <Text style={styles.stat}>Fee recorded — add STRIPE_SECRET_KEY to collect it.</Text>
+        ) : null}
+        {action.feeStatus === 'pending' && !action.stripeCheckoutUrl ? (
+          <Text style={styles.stat}>Stripe payment pending for the success fee.</Text>
+        ) : null}
       </View>
 
       <Text style={styles.loop}>Another {formatMoney(remaining)} is waiting.</Text>

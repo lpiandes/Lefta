@@ -1,32 +1,50 @@
 import { Router } from 'express';
-import { store } from '../services/store';
+import { getStore } from '../db/store';
+import { asyncHandler } from '../middleware/asyncHandler';
+import { requireAuth, userIdOf } from '../middleware/auth';
+import { AppError } from '../lib/errors';
+import { toPublicUser } from '../services/authService';
 
 export const userRouter = Router();
+userRouter.use(requireAuth);
 
-userRouter.get('/me', (_req, res) => {
-  res.json({
-    user: store.user,
-    summary: store.moneySummary(),
-    connections: store.connections,
-  });
-});
+userRouter.get(
+  '/me',
+  asyncHandler(async (req, res) => {
+    const userId = userIdOf(req);
+    const db = await getStore();
+    const user = await db.findUserById(userId);
+    if (!user) throw new AppError('Session expired', 401, 'SESSION_EXPIRED');
+    res.json({
+      user: toPublicUser(user),
+      summary: await db.moneySummary(userId),
+      connections: await db.listConnections(userId),
+      hasScanned: await db.isScanComplete(userId),
+    });
+  }),
+);
 
-userRouter.get('/history', (_req, res) => {
-  const recovered = store.opportunities.filter((o) => o.status === 'recovered');
-  const pending = store.opportunities.filter((o) =>
-    ['submitted', 'waiting', 'awaiting_approval', 'action_planned'].includes(o.status),
-  );
-  const ignored = store.opportunities.filter((o) => o.status === 'ignored');
-  const summary = store.moneySummary();
+userRouter.get(
+  '/history',
+  asyncHandler(async (req, res) => {
+    const userId = userIdOf(req);
+    const db = await getStore();
+    const opportunities = await db.listOpportunities(userId);
+    const recovered = opportunities.filter((o) => o.status === 'recovered');
+    const pending = opportunities.filter((o) =>
+      ['submitted', 'waiting', 'awaiting_approval', 'action_planned'].includes(o.status),
+    );
+    const ignored = opportunities.filter((o) => o.status === 'ignored');
 
-  res.json({
-    summary,
-    recovered,
-    pending,
-    ignored,
-    actions: store.actions,
-  });
-});
+    res.json({
+      summary: await db.moneySummary(userId),
+      recovered,
+      pending,
+      ignored,
+      actions: await db.listActions(userId),
+    });
+  }),
+);
 
 userRouter.get('/privacy', (_req, res) => {
   res.json({
@@ -46,9 +64,13 @@ userRouter.get('/privacy', (_req, res) => {
     security: [
       'Bank password isn’t stored by Find Money',
       'OAuth / provider tokens only — never raw bank credentials',
-      'Encrypted data in transit (TLS) and at rest',
-      'Read-only financial access for MVP',
+      'Plaid access tokens encrypted at rest (AES-256-GCM)',
+      'TLS in transit',
+      'Sessions expire automatically',
+      'Read-only financial access',
       'Delete your data anytime',
     ],
+    minimization:
+      'We store merchant, amount, date, category, and ids needed by detectors — not bank passwords or extra Plaid fields.',
   });
 });

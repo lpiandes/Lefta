@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Share, StyleSheet, Text } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { ActionStep } from '@find-money/shared';
 import { Button } from '../../components/Button';
@@ -20,9 +20,9 @@ export function ActionPlanScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     if (!action) {
-      planAction(route.params.id);
+      void planAction(route.params.id, selfServe);
     }
-  }, [action, planAction, route.params.id]);
+  }, [action, planAction, route.params.id, selfServe]);
 
   const steps: ActionStep[] = useMemo(() => {
     if (action?.steps) return action.steps;
@@ -37,19 +37,19 @@ export function ActionPlanScreen({ navigation, route }: Props) {
 
   if (!opportunity) {
     return (
-      <Screen>
+      <Screen showBack>
         <Text style={styles.title}>Opportunity not found</Text>
       </Screen>
     );
   }
 
   return (
-    <Screen>
+    <Screen showBack>
       <Text style={styles.title}>Action plan</Text>
       <Text style={styles.support}>
         {selfServe
-          ? 'We’ll prepare clear steps so you can handle this yourself.'
-          : 'We’ll prepare a dispute/refund request using the information you’ve provided. Automated execution only happens where legally and technically appropriate — you always approve first.'}
+          ? 'We’ll prepare clear steps so you can handle this yourself. Find Money will not contact the merchant on this path.'
+          : 'We’ll prepare a dispute/refund request using the information you’ve provided. Automated execution only happens where legally and technically appropriate — you always approve first. Recovery is not confirmed until cash posts.'}
       </Text>
 
       <Text style={styles.meta}>
@@ -57,6 +57,25 @@ export function ActionPlanScreen({ navigation, route }: Props) {
       </Text>
 
       <Timeline steps={steps} />
+
+      {(action?.guidance ?? []).map((line) => (
+        <Text key={line} style={styles.guide}>
+          • {line}
+        </Text>
+      ))}
+
+      {action?.disputeDraft ? (
+        <Button
+          label="Share / copy request draft"
+          variant="secondary"
+          onPress={() => void Share.share({ message: action.disputeDraft! })}
+          style={{ marginTop: space.lg }}
+        />
+      ) : null}
+
+      <Text style={styles.guide}>
+        Find Money does not send this to the merchant for you. You review and send it.
+      </Text>
 
       <Button
         label={selfServe ? 'View guidance' : 'Continue to approval'}
@@ -67,7 +86,6 @@ export function ActionPlanScreen({ navigation, route }: Props) {
         }
         style={{ marginTop: space.xl }}
       />
-      <Button label="Back" variant="ghost" onPress={() => navigation.goBack()} style={{ marginTop: space.sm }} />
     </Screen>
   );
 }
@@ -87,5 +105,10 @@ const styles = StyleSheet.create({
     ...type.body,
     color: colors.moneyBright,
     marginBottom: space.md,
+  },
+  guide: {
+    ...type.body,
+    color: colors.textMuted,
+    marginTop: 8,
   },
 });

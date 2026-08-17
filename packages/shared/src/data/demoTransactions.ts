@@ -2,8 +2,9 @@ import type { Account, FinancialConnection, Transaction, User } from '../types';
 import { daysAgo, daysFromNow } from '../lib/dates';
 
 /**
- * Seed data that exercises every MVP detector:
+ * Test-only fixtures that exercise every detector:
  * duplicate, recurring/inactivity, price anomaly, refund window, expiring credit.
+ * Not used by the product API or mobile app.
  */
 export const DEMO_USER: User = {
   id: 'user_demo',

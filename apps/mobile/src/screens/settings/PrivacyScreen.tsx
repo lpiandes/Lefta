@@ -1,6 +1,5 @@
 import { StyleSheet, Text } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Button } from '../../components/Button';
 import { CheckRow } from '../../components/CheckRow';
 import { Screen } from '../../components/Screen';
 import { colors, space, type } from '../../theme';
@@ -17,20 +16,18 @@ const COMMITMENTS = [
   'You can delete your account and data.',
 ];
 
-export function PrivacyScreen({ navigation }: Props) {
+export function PrivacyScreen(_props: Props) {
   return (
-    <Screen>
+    <Screen showBack>
       <Text style={styles.title}>Your Money. Your Data.</Text>
       <Text style={styles.support}>
         Privacy is a product feature. These commitments only hold if the architecture supports them —
-        this MVP is built around data minimization and read-only access.
+        this product is built around data minimization and read-only access.
       </Text>
 
       {COMMITMENTS.map((c) => (
         <CheckRow key={c} label={c} />
       ))}
-
-      <Button label="Back" variant="ghost" onPress={() => navigation.goBack()} style={{ marginTop: space.xl }} />
     </Screen>
   );
 }

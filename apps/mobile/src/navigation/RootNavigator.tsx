@@ -8,9 +8,12 @@ import type { MainTabParamList, RootStackParamList } from './types';
 import { SplashScreen } from '../screens/onboarding/SplashScreen';
 import { OnboardingScreen } from '../screens/onboarding/OnboardingScreen';
 import { PromiseScreen } from '../screens/onboarding/PromiseScreen';
+import { AuthScreen } from '../screens/onboarding/AuthScreen';
 import { ConnectAccountsScreen } from '../screens/onboarding/ConnectAccountsScreen';
 import { BankConnectScreen } from '../screens/onboarding/BankConnectScreen';
+import { PlaidLinkScreen } from '../screens/onboarding/PlaidLinkScreen';
 import { EmailConnectScreen } from '../screens/onboarding/EmailConnectScreen';
+import { UploadBillsScreen } from '../screens/onboarding/UploadBillsScreen';
 import { PermissionsScreen } from '../screens/onboarding/PermissionsScreen';
 import { SecurityScreen } from '../screens/onboarding/SecurityScreen';
 import { ScanningScreen } from '../screens/onboarding/ScanningScreen';
@@ -20,6 +23,7 @@ import { ExpiringScreen } from '../screens/main/ExpiringScreen';
 import { HistoryScreen } from '../screens/main/HistoryScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
 import { PrivacyScreen } from '../screens/settings/PrivacyScreen';
+import { TermsScreen } from '../screens/settings/TermsScreen';
 import { OpportunityDetailScreen } from '../screens/opportunity/OpportunityDetailScreen';
 import { ActionPlanScreen } from '../screens/opportunity/ActionPlanScreen';
 import { ApprovalScreen } from '../screens/opportunity/ApprovalScreen';
@@ -111,9 +115,12 @@ export function RootNavigator() {
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Promise" component={PromiseScreen} />
+        <Stack.Screen name="Auth" component={AuthScreen} />
         <Stack.Screen name="ConnectAccounts" component={ConnectAccountsScreen} />
         <Stack.Screen name="BankConnect" component={BankConnectScreen} />
+        <Stack.Screen name="PlaidLink" component={PlaidLinkScreen} />
         <Stack.Screen name="EmailConnect" component={EmailConnectScreen} />
+        <Stack.Screen name="UploadBills" component={UploadBillsScreen} />
         <Stack.Screen name="Permissions" component={PermissionsScreen} />
         <Stack.Screen name="Security" component={SecurityScreen} />
         <Stack.Screen name="Scanning" component={ScanningScreen} />
@@ -124,6 +131,7 @@ export function RootNavigator() {
         <Stack.Screen name="Tracking" component={TrackingScreen} />
         <Stack.Screen name="Success" component={SuccessScreen} />
         <Stack.Screen name="Privacy" component={PrivacyScreen} />
+        <Stack.Screen name="Terms" component={TermsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
